@@ -1,5 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
+.godot.tmp
 /android/
 builds/
 .vscode/
@@ -11,3 +12,4 @@ dev/
 addons/resources_spreadsheet_view/saved_state.json
 .cursorignore
 functions/
+
