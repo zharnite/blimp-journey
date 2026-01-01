@@ -43,11 +43,8 @@ func _ready() -> void:
 	""".split("\n")
 	Dialogic.start(timeline)
 
-	if Firebase.Auth.is_logged_in():
-		SaverLoader.load_game()
-	else:
-		change_scene("main_street", Vector2.ZERO, false)
-		SaverLoader.complete_event("%02d_started" % level_code)
+	# Removed Firebase Auth check. We assume we are ready to load if we are here.
+	SaverLoader.load_game()
 
 
 func change_scene(to: String, position: Vector2 = Vector2.ZERO, should_fade_in: bool = true) -> void:
@@ -66,7 +63,8 @@ func change_scene(to: String, position: Vector2 = Vector2.ZERO, should_fade_in: 
 		Dialogic.end_timeline()
 		scene.queue_free()
 	else:
-		printerr("[Level] Cannot remove the current scene, it is not valid!")
+		pass
+		# printerr("[Level] Cannot remove the current scene, it is not valid!")
 	
 	# Wait a frame for the scene to be freed
 	await get_tree().process_frame
@@ -119,29 +117,43 @@ func reload_current_scene(position: Vector2 = Vector2.ZERO) -> void:
 	change_scene(scene.scene_name, position)
 
 
-func save_data(document: FirestoreDocument) -> void:
-	document.set_field("levels.current_level", "%02d" % level_code)
-	document.set_field("levels.%02d.current_scene" % level_code, scene.scene_name if scene else "main_street")
-	document.set_field("levels.%02d.position" % level_code, get_tree().get_first_node_in_group("player").global_position)
-	document.set_field("levels.%02d.completed_events" % level_code, completed_events)
+func save_data(data: Dictionary) -> void:
+	SaverLoader.set_nested(data, "levels.current_level", "%02d" % level_code)
+	SaverLoader.set_nested(data, "levels.%02d.current_scene" % level_code, scene.scene_name if scene else "main_street")
+	SaverLoader.set_nested(data, "levels.%02d.position" % level_code, get_tree().get_first_node_in_group("player").global_position)
+	SaverLoader.set_nested(data, "levels.%02d.completed_events" % level_code, completed_events)
 
 	# Save Dialogic's variables
-	document.set_field("levels.%02d.dialogic" % level_code, Dialogic.VAR["%02d" % level_code].data)
+	if Dialogic.VAR.has("%02d" % level_code):
+		SaverLoader.set_nested(data, "levels.%02d.dialogic" % level_code, Dialogic.VAR["%02d" % level_code].data)
 
 
-func load_data(document: FirestoreDocument) -> void:
+func load_data(data: Dictionary) -> void:
 	# Load the completed events
-	completed_events = Array(document.get_field("levels.%02d.completed_events" % level_code, ["%02d_started" % level_code]), TYPE_STRING, "", null)
+	var default_events = ["%02d_started" % level_code]
+	var events_var = SaverLoader.get_nested(data, "levels.%02d.completed_events" % level_code, default_events)
+	if events_var is Array and not events_var.is_empty():
+		# Manual cast/copy to ensure it's an array of strings
+		completed_events = []
+		for e in events_var:
+			completed_events.append(str(e))
+	else:
+		completed_events = default_events
 
 	# Load Dialogic's variables
-	Dialogic.VAR["%02d" % level_code].data = document.get_field("levels.%02d.dialogic" % level_code, {})
+	var dialogic_data = SaverLoader.get_nested(data, "levels.%02d.dialogic" % level_code, {})
+	if Dialogic.VAR.has("%02d" % level_code):
+		Dialogic.VAR["%02d" % level_code].data = dialogic_data
 
-	# Load the current scene
-	var current_scene: String = document.get_field("levels.%02d.current_scene" % level_code, "main_street")
-	await change_scene(current_scene, Vector2.ZERO, false)
+	# Load the player's position first
+	var pos_var = SaverLoader.get_nested(data, "levels.%02d.position" % level_code, Vector2.ZERO)
+	var spawn_pos = Vector2.ZERO
+	if pos_var is Vector2:
+		spawn_pos = pos_var
 
-	# Load the player's position
-	get_tree().get_first_node_in_group("player").global_position = document.get_field("levels.%02d.position" % level_code, Vector2.ZERO)
+	# Load the current scene and spawn player at the saved position
+	var current_scene: String = SaverLoader.get_nested(data, "levels.%02d.current_scene" % level_code, "main_street")
+	await change_scene(current_scene, spawn_pos, false)
 
 
 func _get_current_scene() -> Scene:

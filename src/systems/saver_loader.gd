@@ -1,6 +1,5 @@
 extends Node
 
-const COLLECTION_ID: String = "saves"
 const DEFAULTS: Dictionary = {
 	"metadata": {
 		"version": 0,
@@ -20,7 +19,7 @@ const DEFAULTS: Dictionary = {
 			"stripe_customer_id": "",
 		},
 		"appearance": {},
-		"tags": [],  # For A/B testing, etc.
+		"tags": [],
 	},
 	"levels": {
 		"current_level": "",
@@ -28,10 +27,10 @@ const DEFAULTS: Dictionary = {
 }
 
 ## Hold data that doesn't need to be saved permanently.
-var temp: Dictionary
-## Latest save file retrieved from the server.
-## May be outdated, so prefer calling [method SaverLoader.load_game] to get the latest data.
-var latest_document: FirestoreDocument
+var temp: Dictionary = {}
+
+var current_slot: int = 1
+var latest_data: Dictionary = {}
 
 var _save_file_updaters: Array[Callable] = [
 	# _v0_to_v1,
@@ -42,104 +41,96 @@ func _ready() -> void:
 	add_to_group("persist")
 
 
+func get_save_path(slot: int) -> String:
+	return "user://save_slot_%d.json" % slot
+
+
 func save_game() -> void:
-	# Retrieve the save data
-	var document: FirestoreDocument = await _get_document()
-
-	if document == null:
-		return
+	# Use latest_data if available, otherwise start with DEFAULTS copy
+	var data_to_save = latest_data.duplicate(true)
+	if data_to_save.is_empty():
+		data_to_save = DEFAULTS.duplicate(true)
 	
-	latest_document = document
-
+	# Update metadata
+	set_nested(data_to_save, "metadata.version", DEFAULTS.metadata.version)
+	
 	# Get data from persistable entities
 	for entity: Node in get_tree().get_nodes_in_group("persist"):
 		if not entity.has_method("save_data"):
-			printerr(entity, " does not have save method despite being in persist group.")
 			continue
 		
-		entity.save_data(document)
+		# We pass the dictionary directly now
+		entity.save_data(data_to_save)
 	
-	# Upload the save data
-	var collection: FirestoreCollection = Firebase.Firestore.collection(COLLECTION_ID)
-	await collection.update(document)
-
-	print("Save successful.")
-	EventBus.save_completed.emit()
-
-
-func load_game() -> void:
-	# Retrieve the save data on the server
-	var document: FirestoreDocument = await _get_document()
-
-	if document == null:
-		return
-
-	# Check version and update if outdated
-	var current_version: int = document.get_field("metadata.version", -1)
+	latest_data = data_to_save
 	
-	if current_version == -1:
-		push_error("[SaverLoader] This save file doesn't have a `version` property. Aborting...")
-		return
+	# Write to disk
+	var file = FileAccess.open(get_save_path(current_slot), FileAccess.WRITE)
+	if file:
+		file.store_string(var_to_str(data_to_save))
+		file.close()
+		print("Save successful to slot %d." % current_slot)
+		EventBus.save_completed.emit()
+	else:
+		printerr("Failed to open save file for writing.")
 
-	for version: int in range(current_version, _save_file_updaters.size()):
-		var updating_document: Variant = _save_file_updaters[version].call(document.copy())
 
-		if updating_document == null:
-			push_error("[SaverLoader] Updated from v%d to v%d. Aborting save file update..." % [current_version, document.get_field("metadata.version", -1)])
-			break
+func load_game(slot: int = -1) -> void:
+	if slot != -1:
+		current_slot = slot
+
+	var path = get_save_path(current_slot)
+	if not FileAccess.file_exists(path):
+		print("No save file found for slot %d. Creating new." % current_slot)
+		latest_data = DEFAULTS.duplicate(true)
+	else:
+		var file = FileAccess.open(path, FileAccess.READ)
+		var text = file.get_as_text()
+		file.close()
+		
+		var data = str_to_var(text)
+		if data is Dictionary:
+			latest_data = data
+			print("Loaded save from slot %d." % current_slot)
+		else:
+			printerr("Save file corrupted or invalid format.")
+			latest_data = DEFAULTS.duplicate(true)
+
+	# --- Version Upgrading Logic ---
+	var current_version: int = -1
+	if latest_data.has("metadata") and latest_data.metadata.has("version"):
+		current_version = int(latest_data.metadata.version)
 	
-		document = updating_document
-
-		print("[SaverLoader] Updated from v%d to v%d." % [current_version, document.get_field("metadata.version", -1)])
-	
-	latest_document = document
+	for version in range(current_version, _save_file_updaters.size()):
+		var result = _save_file_updaters[version].call(latest_data.duplicate(true))
+		if result:
+			latest_data = result
+			print("Updated save from v%d to v%d" % [current_version, version + 1])
 
 	# Load data into entities
 	for entity: Node in get_tree().get_nodes_in_group("persist"):
 		if not entity.has_method("load_data"):
-			printerr(entity, " does not have load method despite being in persist group.")
 			continue
-
-		entity.load_data(document)
+		entity.load_data(latest_data)
 	
-	print("Load successful.")
+	print("Load process complete.")
 
 
 func reset_level(level_code: int) -> void:
-	# Retrieve the save data on the server
-	var document: FirestoreDocument = await _get_document()
-
-	if document == null:
-		return
-	
-	document.remove_field("levels.%02d" % level_code)
-	document.set_field("levels.current_level", "")
-
-	Inventory.clear()
-
-	# Upload the save data
-	var collection: FirestoreCollection = Firebase.Firestore.collection(COLLECTION_ID)
-	await collection.update(document)
-
-	print("Level %02d reset." % level_code)
+	if latest_data.has("levels"):
+		var key = "%02d" % level_code
+		if latest_data.levels.has(key):
+			latest_data.levels.erase(key)
+		latest_data.levels.current_level = ""
+		
+		Inventory.clear()
+		save_game()
+		print("Level %02d reset." % level_code)
 
 
 func reset_save_game() -> void:
-	if not Firebase.Auth.is_logged_in():
-		printerr("[SaverLoader] User is not authenticated. Aborting...")
-		return
-		
-	var auth: Dictionary = Firebase.Auth.auth
-	var collection: FirestoreCollection = Firebase.Firestore.collection(COLLECTION_ID)
-	
-	# NOTE: The following line is expected to throw a GET error, ignore it
-	# There is no "has_doc" to check if a doc exists 
-	var document: FirestoreDocument = await collection.get_doc(auth.localid)
-	
-	if document:
-		await collection.delete(document)
-	
-	await collection.add(auth.localid, DEFAULTS)
+	latest_data = DEFAULTS.duplicate(true)
+	save_game()
 
 
 func complete_event(event: String) -> void:
@@ -149,39 +140,37 @@ func complete_event(event: String) -> void:
 	EventBus.event_completed.emit(event)
 
 
-func save_data(document: FirestoreDocument) -> void:
-	document.set_field("metadata.version", DEFAULTS.metadata.version)
+# Allow SaverLoader itself to save/load (e.g. for version metadata)
+func save_data(data: Dictionary) -> void:
+	set_nested(data, "metadata.version", DEFAULTS.metadata.version)
 
-
-func load_data(document: FirestoreDocument) -> void:
+func load_data(data: Dictionary) -> void:
 	pass
 
+#region Helpers
+func set_nested(data: Dictionary, path: String, value: Variant) -> void:
+	var keys = path.split(".")
+	var current = data
+	for i in range(keys.size() - 1):
+		var key = keys[i]
+		if not current.has(key) or not (current[key] is Dictionary):
+			current[key] = {}
+		current = current[key]
+	current[keys[-1]] = value
 
-## Helper method to get the document from the server
-## Returns null if there's an error or the user is not authenticated
-func _get_document() -> FirestoreDocument:
-	var auth: Dictionary = Firebase.Auth.auth
-
-	if not Firebase.Auth.is_logged_in():
-		printerr("[SaverLoader] User is not authenticated. Aborting...")
-		return null
-	
-	var collection: FirestoreCollection = Firebase.Firestore.collection(COLLECTION_ID)
-	var document: FirestoreDocument = await collection.get_doc(auth.localid)
-	
-	if document == null:
-		printerr("[SaverLoader] Cannot retrieve save file from server. Aborting...")
-		return null
-		
-	return document
-
+func get_nested(data: Dictionary, path: String, default: Variant = null) -> Variant:
+	var keys = path.split(".")
+	var current = data
+	for key in keys:
+		if current is Dictionary and current.has(key):
+			current = current[key]
+		else:
+			return default
+	return current
+#endregion
 
 #region Save File Updaters
-
-## If null is returned, an error has occured.
-## Don't forget to update the version number in the metadata.
-func _v0_to_v1(document: FirestoreDocument) -> Variant:
-	document.set_field("metadata.version", 1)
-	return document
-
+func _v0_to_v1(data: Dictionary) -> Dictionary:
+	set_nested(data, "metadata.version", 1)
+	return data
 #endregion

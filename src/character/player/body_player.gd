@@ -26,30 +26,32 @@ func set_style(style: Style) -> void:
 	SaverLoader.temp.style = style
 
 
-func save_data(document: FirestoreDocument) -> void:
+func save_data(data: Dictionary) -> void:
 	for part_key: String in _style.get_all_style_attributes().keys():
 		var part_value: Variant = _style.get_all_style_attributes().get(part_key)
 
 		if part_value is StylePart:
-			document.set_field(BASE_PATH + part_key, part_value.style_name)
+			SaverLoader.set_nested(data, BASE_PATH + part_key, part_value.style_name)
 		elif part_value is Color:
-			document.set_field(BASE_PATH + part_key, part_value)
+			SaverLoader.set_nested(data, BASE_PATH + part_key, part_value)
 		elif part_value == null:
-			document.set_field(BASE_PATH + part_key, null)
+			SaverLoader.set_nested(data, BASE_PATH + part_key, null)
 		else:
 			printerr("[BodyPlayer] Unknown type for part: ", part_key, " with value: ", part_value)
 			continue
 
 
-func load_data(document: FirestoreDocument) -> void:
-	if document.get_field(BASE_PATH.trim_suffix(".")).is_empty():
+func load_data(data: Dictionary) -> void:
+	# Check if the appearance object exists
+	var appearance = SaverLoader.get_nested(data, BASE_PATH.trim_suffix("."), {})
+	if appearance.is_empty():
 		printerr("[BodyPlayer] No style found in document. Aborting load...")
 		return
 	
 	var style: Style = Style.new()
 
 	for part_key: String in _style.get_all_style_attributes().keys():
-		var part_value: Variant = document.get_field(BASE_PATH + part_key)
+		var part_value: Variant = SaverLoader.get_nested(data, BASE_PATH + part_key)
 
 		if part_value is String:
 			var style_part: StylePart = CharacterParts.get_style_part_from_style_name(part_value)
@@ -59,7 +61,8 @@ func load_data(document: FirestoreDocument) -> void:
 		elif part_value == null:
 			style.set(part_key, null)
 		else:
-			printerr("[BodyPlayer] Unknown type for part: ", part_key, " with value: ", part_value)
+			# It might be missing in the save file, which is fine, we just skip it
+			# printerr("[BodyPlayer] Unknown type for part: ", part_key, " with value: ", part_value)
 			continue
 
 	set_style(style)

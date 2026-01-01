@@ -20,12 +20,12 @@ func clear_clouds(region: int) -> void:
 	printerr("Nothing happened... Check if the region is correct.")
 
 
-func save_data(document: FirestoreDocument) -> void:
+func save_data(data: Dictionary) -> void:
 	pass
 
 
-func load_data(document: FirestoreDocument) -> void:
+func load_data(data: Dictionary) -> void:
 	for condition: CloudClearCondition in clear_clouds_conditions:
-		var completed_events: Array = document.get_field("levels.%02d.completed_events" % condition.level_code, [])
+		var completed_events: Array = SaverLoader.get_nested(data, "levels.%02d.completed_events" % condition.level_code, [])
 		if completed_events.has(condition.final_event):
 			clear_clouds(condition.region_to_clear)

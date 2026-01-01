@@ -100,7 +100,7 @@ func _teleport_player(mode: String, x: int, y: int) -> void:
 func _reset() -> void:
 	var level_code: int = _level.level_code
 
-	await SaverLoader.reset_level(level_code)
+	SaverLoader.reset_level(level_code)
 
 	get_tree().reload_current_scene()
 

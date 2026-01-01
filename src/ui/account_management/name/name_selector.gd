@@ -34,20 +34,23 @@ func show_error_to_user(problem: String) -> void:
 	%ErrorLabel.text = problem
 
 
-func save_data(document: FirestoreDocument) -> void:
-	document.set_field("player.first_name", first_name.get_word())
-	document.set_field("player.last_name", last_name.get_word())
-	document.set_field("player.username", %UsernameLineEdit.text)
+func save_data(data: Dictionary) -> void:
+	SaverLoader.set_nested(data, "player.first_name", first_name.get_word())
+	SaverLoader.set_nested(data, "player.last_name", last_name.get_word())
+	SaverLoader.set_nested(data, "player.username", %UsernameLineEdit.text)
 
 
-func load_data(document: FirestoreDocument) -> void:
+func load_data(data: Dictionary) -> void:
 	# The field is empty by default, don't load it if it is (new player)
-	if document.get_field("player.first_name", "").is_empty() or document.get_field("player.last_name", "").is_empty():
+	var fname = SaverLoader.get_nested(data, "player.first_name", "")
+	var lname = SaverLoader.get_nested(data, "player.last_name", "")
+	
+	if fname.is_empty() or lname.is_empty():
 		return
 
-	first_name.set_word(document.get_field("player.first_name", first_name.get_word()))
-	last_name.set_word(document.get_field("player.last_name", last_name.get_word()))
-	%UsernameLineEdit.text = document.get_field("player.username", %UsernameLineEdit.text)
+	first_name.set_word(fname)
+	last_name.set_word(lname)
+	%UsernameLineEdit.text = SaverLoader.get_nested(data, "player.username", %UsernameLineEdit.text)
 
 
 func _on_continue_button_pressed() -> void:
@@ -61,7 +64,7 @@ func _on_continue_button_pressed() -> void:
 		show_error_to_user("Your username is too long!")
 		return
 
-	await SaverLoader.save_game()
+	SaverLoader.save_game()
 
 	#SceneLoader.load_scene(NEXT_SCENE)
 	get_tree().change_scene_to_file(NEXT_SCENE)

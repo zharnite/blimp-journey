@@ -90,24 +90,24 @@ func load_level_items(level_code: int) -> void:
 		available_items[card.name] = card
 
 
-func save_data(document: FirestoreDocument) -> void:
-	var current_level: String = document.get_field("levels.current_level", "")
+func save_data(data: Dictionary) -> void:
+	var current_level: String = SaverLoader.get_nested(data, "levels.current_level", "")
 
 	if current_level.is_empty():
-		printerr("[Inventory] Cannot retrieve current level from save file. Aborting save...")
+		# No level loaded yet, nothing to save for inventory
 		return
 	
-	document.set_field("levels.%s.inventory" % current_level, slots)
+	SaverLoader.set_nested(data, "levels.%s.inventory" % current_level, slots)
 
 
-func load_data(document: FirestoreDocument) -> void:
-	var current_level: String = document.get_field("levels.current_level", "")
+func load_data(data: Dictionary) -> void:
+	var current_level: String = SaverLoader.get_nested(data, "levels.current_level", "")
 
 	if current_level.is_empty():
-		printerr("[Inventory] Cannot retrieve current level from save file. Aborting load...")
+		# No level loaded yet, nothing to load for inventory
 		return
 	
-	slots = document.get_field("levels.%s.inventory" % current_level, {})
+	slots = SaverLoader.get_nested(data, "levels.%s.inventory" % current_level, {})
 
 	for item: String in slots.keys():
 		updated.emit(item, slots[item])

@@ -41,6 +41,7 @@ Inventory="*res://src/systems/inventory.gd"
 Maid="*res://src/systems/maid.gd"
 AppConfig="*res://addons/maaacks_menus_template/base/scenes/autoloads/app_config.tscn"
 ProjectUISoundController="*res://addons/maaacks_menus_template/base/scenes/autoloads/project_ui_sound_controller.tscn"
+Firebase="*res://addons/godot-firebase/firebase/firebase.tscn"
 Loading="*res://src/ui/loading/loading.tscn"
 ProjectMusicController="*res://addons/maaacks_menus_template/base/scenes/autoloads/project_music_controller.tscn"
 

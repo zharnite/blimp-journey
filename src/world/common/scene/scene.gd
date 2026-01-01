@@ -7,4 +7,4 @@ extends Node
 
 
 func _ready() -> void:
-	var level: Level = get_tree().get_first_node_in_group("level")
+	var _level: Level = get_tree().get_first_node_in_group("level")
