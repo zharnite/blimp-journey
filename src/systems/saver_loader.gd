@@ -3,6 +3,8 @@ extends Node
 const DEFAULTS: Dictionary = {
 	"metadata": {
 		"version": 0,
+		"timestamp": "",
+		"date_string": "",
 	},
 	"stats": {
 		"playtime": 0,
@@ -53,6 +55,12 @@ func save_game() -> void:
 	
 	# Update metadata
 	set_nested(data_to_save, "metadata.version", DEFAULTS.metadata.version)
+	
+	# Add Timestamp
+	var time_dict = Time.get_datetime_dict_from_system()
+	var date_str = "%04d-%02d-%02d %02d:%02d" % [time_dict.year, time_dict.month, time_dict.day, time_dict.hour, time_dict.minute]
+	set_nested(data_to_save, "metadata.timestamp", Time.get_unix_time_from_system())
+	set_nested(data_to_save, "metadata.date_string", date_str)
 	
 	# Get data from persistable entities
 	for entity: Node in get_tree().get_nodes_in_group("persist"):
@@ -114,6 +122,34 @@ func load_game(slot: int = -1) -> void:
 		entity.load_data(latest_data)
 	
 	print("Load process complete.")
+
+
+func get_slot_metadata(slot: int) -> Dictionary:
+	var path = get_save_path(slot)
+	if not FileAccess.file_exists(path):
+		return { "empty": true }
+	
+	var file = FileAccess.open(path, FileAccess.READ)
+	if not file:
+		return { "empty": true, "error": "Could not open file" }
+		
+	var text = file.get_as_text()
+	file.close()
+	
+	var data = str_to_var(text)
+	if data is Dictionary:
+		var metadata = get_nested(data, "metadata", {})
+		metadata["empty"] = false
+		return metadata
+	else:
+		return { "empty": false, "error": "Corrupted" }
+
+
+func delete_save(slot: int) -> void:
+	var path = get_save_path(slot)
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(path)
+		print("Deleted save slot %d" % slot)
 
 
 func reset_level(level_code: int) -> void:

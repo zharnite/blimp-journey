@@ -18,7 +18,7 @@ func _ready() -> void:
 
 
 func setup_save_slots_ui() -> void:
-	# Clear existing subscenes
+	# Clear existing subscenes/buttons
 	for child in %Subscenes.get_children():
 		child.queue_free()
 	
@@ -37,18 +37,49 @@ func setup_save_slots_ui() -> void:
 	label.add_theme_font_size_override("font_size", 32)
 	vbox.add_child(label)
 	
-	# Create 3 buttons
+	# Create 3 slots
 	for i in range(1, 4):
+		var slot_container = HBoxContainer.new()
+		slot_container.alignment = BoxContainer.ALIGNMENT_CENTER
+		vbox.add_child(slot_container)
+		
+		# Metadata
+		var meta = SaverLoader.get_slot_metadata(i)
+		var is_empty = meta.get("empty", true)
+		var date_str = meta.get("date_string", "Unknown Date")
+		
+		# Main Slot Button
 		var btn = Button.new()
-		btn.text = "Save Slot %d" % i
-		btn.custom_minimum_size = Vector2(200, 60)
+		btn.custom_minimum_size = Vector2(300, 60)
+		
+		if is_empty:
+			btn.text = "Slot %d: New Game" % i
+		else:
+			btn.text = "Slot %d: %s" % [i, date_str]
+			
 		btn.pressed.connect(_on_slot_selected.bind(i))
-		vbox.add_child(btn)
+		slot_container.add_child(btn)
+		
+		# Delete Button (Only if not empty)
+		if not is_empty:
+			var delete_btn = Button.new()
+			delete_btn.text = "Delete" # Could use an icon here if available
+			delete_btn.modulate = Color.INDIAN_RED
+			delete_btn.custom_minimum_size = Vector2(80, 60)
+			delete_btn.pressed.connect(_on_delete_pressed.bind(i))
+			slot_container.add_child(delete_btn)
+
 
 func _on_slot_selected(slot_index: int) -> void:
 	message_user("Loading Slot %d..." % slot_index)
 	SaverLoader.load_game(slot_index)
 	switch_to_next_scene()
+
+
+func _on_delete_pressed(slot_index: int) -> void:
+	SaverLoader.delete_save(slot_index)
+	setup_save_slots_ui() # Refresh the UI
+	message_user("Slot %d deleted." % slot_index)
 
 
 func message_user(message: String = "") -> void:
