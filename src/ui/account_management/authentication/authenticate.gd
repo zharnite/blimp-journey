@@ -2,6 +2,15 @@ extends Control
 
 const OPTIONS_MENU_MINI: PackedScene = preload("res://src/ui/maaack/overlaid_menus/mini_options_overlaid_menu.tscn")
 
+const LEVEL_PATHS = {
+	"02": "res://src/world/levels/02_reality_tv/world.tscn",
+	"03": "res://src/world/levels/03_groundlands/level.tscn",
+	"04": "res://src/world/levels/04_volcano/level.tscn",
+	"05": "res://src/world/levels/05_tutorial/tutorial.tscn",
+	"06": "res://src/world/levels/06_dragons_claw/dragons_claw_volcano.tscn",
+	"07": "res://src/world/levels/07_scorched_complex/scorched_complex.tscn"
+}
+
 @export var next_scene: PackedScene
 @export var subscenes: Dictionary
 
@@ -18,7 +27,7 @@ func _ready() -> void:
 
 
 func setup_save_slots_ui() -> void:
-	# Clear existing subscenes/buttons
+	# Clear existing subscenes
 	for child in %Subscenes.get_children():
 		child.queue_free()
 	
@@ -90,7 +99,17 @@ func switch_to_next_scene() -> void:
 	# Gives time for the loading message to appear
 	await get_tree().create_timer(0.1).timeout
 	
-	Loading.load_scene("res://src/world/overworld_map/overworld_map.tscn", true)
+	# Determine where to go
+	var target_scene = "res://src/world/overworld_map/overworld_map.tscn"
+	
+	var current_level = SaverLoader.get_nested(SaverLoader.latest_data, "levels.current_level", "")
+	if not current_level.is_empty() and LEVEL_PATHS.has(current_level):
+		target_scene = LEVEL_PATHS[current_level]
+		print("Resuming level: ", current_level)
+	else:
+		print("No active level found, going to map.")
+	
+	Loading.load_scene(target_scene, true)
 
 
 func _on_settings_button_pressed() -> void:

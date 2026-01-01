@@ -18,6 +18,10 @@ static var is_processing_level: bool
 func _ready() -> void:
 	EventBus.clouds_cleared.connect(_on_clouds_cleared)
 	
+	# Make material unique so outlines don't share state
+	if $Sprite2D.material:
+		$Sprite2D.material = $Sprite2D.material.duplicate()
+	
 	# Hide and disable interaction if the level is not yet active
 	if region != -1:
 		input_pickable = false
@@ -41,14 +45,16 @@ func load_level() -> void:
 
 
 func _mouse_enter() -> void:
-	$Sprite2D.material.set_shader_parameter("minLineWidth", OUTLINE_WIDTH_MIN)
-	$Sprite2D.material.set_shader_parameter("maxLineWidth", OUTLINE_WIDTH_MAX)
+	if $Sprite2D.material:
+		$Sprite2D.material.set_shader_parameter("minLineWidth", OUTLINE_WIDTH_MIN)
+		$Sprite2D.material.set_shader_parameter("maxLineWidth", OUTLINE_WIDTH_MAX)
 	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
 
 
 func _mouse_exit() -> void:
-	$Sprite2D.material.set_shader_parameter("minLineWidth", 0)
-	$Sprite2D.material.set_shader_parameter("maxLineWidth", 0)
+	if $Sprite2D.material:
+		$Sprite2D.material.set_shader_parameter("minLineWidth", 0)
+		$Sprite2D.material.set_shader_parameter("maxLineWidth", 0)
 	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 
 

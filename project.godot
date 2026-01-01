@@ -24,7 +24,7 @@ resources_spreadsheet_view/resource_cell_label_mode=1
 
 config/name="Blimp Journey"
 config/version="1.2.0-alpha.6"
-run/main_scene="uid://ctgq87cq2776k"
+run/main_scene="uid://c5jgoujkbrge5"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 run/max_fps=60
 config/icon="res://icon.svg"
