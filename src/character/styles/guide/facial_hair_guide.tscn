@@ -3,9 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://qsbhtdr4bkfu" path="res://src/character/styles/guide/facial_hair.png" id="1_365w2"]
 [ext_resource type="Script" uid="uid://b45j8fky1o1s1" path="res://src/character/common/style/style_part.gd" id="2_yhogp"]
 
-[node name="FacialHair" type="Sprite2D"]
-texture = ExtResource("1_365w2")
-offset = Vector2(8, 6)
+[node name="FacialHair" type="Node2D"]
 script = ExtResource("2_yhogp")
 style_name = "facial_hair_guide"
 part = 13
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(8, 6)
+texture = ExtResource("1_365w2")

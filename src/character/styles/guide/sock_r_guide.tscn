@@ -3,9 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://dptag4e1ym0c5" path="res://src/character/styles/guide/sock_r.png" id="1_ohl4j"]
 [ext_resource type="Script" uid="uid://b45j8fky1o1s1" path="res://src/character/common/style/style_part.gd" id="2_346g4"]
 
-[node name="SockR" type="Sprite2D"]
-texture = ExtResource("1_ohl4j")
-offset = Vector2(-5, 19)
+[node name="SockR" type="Node2D"]
 script = ExtResource("2_346g4")
 style_name = "sock_r_guide"
 part = 28
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-5, 5)
+texture = ExtResource("1_ohl4j")

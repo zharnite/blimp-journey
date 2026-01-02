@@ -3,9 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://nnqc3m5pebsp" path="res://src/character/styles/player/shoe_r.png" id="1_aguje"]
 [ext_resource type="Script" uid="uid://b45j8fky1o1s1" path="res://src/character/common/style/style_part.gd" id="2_1uvo4"]
 
-[node name="ShoeR" type="Sprite2D"]
-texture = ExtResource("1_aguje")
-offset = Vector2(-4, 38)
+[node name="ShoeR" type="Node2D"]
 script = ExtResource("2_1uvo4")
 style_name = "shoe_r_player"
 part = 30
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-4, 25)
+texture = ExtResource("1_aguje")

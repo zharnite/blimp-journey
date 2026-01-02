@@ -3,9 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://ci8ewy0lbb7t4" path="res://src/character/styles/guide/shirt.png" id="1_cdrpd"]
 [ext_resource type="Script" uid="uid://b45j8fky1o1s1" path="res://src/character/common/style/style_part.gd" id="2_fom48"]
 
-[node name="Shirt" type="Sprite2D"]
-texture = ExtResource("1_cdrpd")
-offset = Vector2(1.68, -37.15)
+[node name="Shirt" type="Node2D"]
 script = ExtResource("2_fom48")
 style_name = "shirt_guide"
 part = 15
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(1.68, -15)
+texture = ExtResource("1_cdrpd")

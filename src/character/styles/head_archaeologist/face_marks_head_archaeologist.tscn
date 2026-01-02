@@ -3,9 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://josrgy6v3m8i" path="res://src/character/styles/head_archaeologist/face_marks.png" id="1_8hm4g"]
 [ext_resource type="Script" uid="uid://b45j8fky1o1s1" path="res://src/character/common/style/style_part.gd" id="2_ajgda"]
 
-[node name="FaceMarks" type="Sprite2D"]
-texture = ExtResource("1_8hm4g")
-offset = Vector2(-3, -11)
+[node name="FaceMarks" type="Node2D"]
 script = ExtResource("2_ajgda")
 style_name = "face_marks_head_archaeologist"
 part = 12
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-3, -11)
+texture = ExtResource("1_8hm4g")

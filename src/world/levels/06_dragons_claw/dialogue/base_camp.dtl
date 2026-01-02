@@ -2,7 +2,6 @@ label force_walkie_talkie
 player: I should probably talk with the Head Archaeologist.\
 She might have some important information for me about the tomb.
 [end_timeline]
-
 label head_archaeologist
 npc: That stubborn Martin!\
 He rushed in despite my explicit warnings!\
@@ -45,12 +44,12 @@ Life's funny that way, isn't it?
 label archaeologist_4
 if {Inventory.has_item("06_family_photos")}:
 	npc: Those are photos of Martin's family.\
-	It's sad to see what he gave up to find this place...
+It's sad to see what he gave up to find this place...
 else:
 	npc: I found this by Martin's tent.
 	do Inventory.add_item("06_family_photos")
 	npc: I didn't know Martin had kids.\
-	I wonder if they know what he's doing out here.
+I wonder if they know what he's doing out here.
 [end_timeline]
 
 label paramedic_1
@@ -88,12 +87,12 @@ Those murals at the beginning though...\
 They suggest there are more tombs like this!
 if {Inventory.has_item("06_family_photos")}:
 	npc: Wait!\
-	Are those my family photos?!\
-	I thought these were lost forever when I sacrificed my journal.
+Are those my family photos?!\
+I thought these were lost forever when I sacrificed my journal.
 	do Inventory.remove_item("06_family_photos")
 	npc: Ah~ I'm glad that at least I could keep this.\
-	Maybe... maybe some things are worth holding onto.\
-	Thank you for bringing them back to me.
+Maybe... maybe some things are worth holding onto.\
+Thank you for bringing them back to me.
 [end_timeline]
 
 label archaeologist_1_aftermath
@@ -117,11 +116,11 @@ And he could definitely use some of her caution!
 label archaeologist_4_aftermath
 if {Inventory.has_item("06_family_photos")}:
 	npc: Why don't you give Mr. Martin his family photos?\
-	I think he'd appreciate that.\
-	Especially after all the flak he went through to find this place.
+I think he'd appreciate that.\
+Especially after all the flak he went through to find this place.
 else:
 	npc: Kinda makes you think about priorities, doesn't it?\
-	Adventure's great, but so is having someone to come home to.
+Adventure's great, but so is having someone to come home to.
 [end_timeline]
 
 label paramedic_1_aftermath

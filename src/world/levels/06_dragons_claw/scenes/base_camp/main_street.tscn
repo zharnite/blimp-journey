@@ -141,12 +141,11 @@ height = 1
 script = ExtResource("64_o2xbi")
 hair_back = ExtResource("74_7tksw")
 hair_front = ExtResource("75_lglyl")
-mouth = ExtResource("76_rrw75")
 face_marks = ExtResource("73_rtoj1")
 shirt = ExtResource("76_eaync")
 shoe_r = ExtResource("78_eaync")
 shoe_l = ExtResource("77_lglyl")
-color_skin = Color(0.709804, 0.513726, 0.352941, 1)
+color_skin = Color(0.931958, 0.829639, 0.864491, 1)
 color_head = Color(1, 1, 1, 1)
 color_eyelid_r = Color(1, 1, 1, 1)
 color_eyelid_l = Color(1, 1, 1, 1)
@@ -297,12 +296,6 @@ scene_name = "main_street"
 [node name="Player" parent="." index="1"]
 style = SubResource("Resource_2mgfo")
 
-[node name="PCamTarget" parent="Player" index="10"]
-visible = false
-
-[node name="PCamCinematic" parent="Player" index="11"]
-visible = false
-
 [node name="WalkieTalkie" type="Polygon2D" parent="Player" index="12"]
 visible = false
 position = Vector2(104, -138)
@@ -324,19 +317,21 @@ right_limit = 7700
 top_limit = -5000
 bottom_limit = 1052
 
-[node name="Environment" type="Node2D" parent="." index="3"]
+[node name="Environment2" type="Node2D" parent="." index="3"]
 metadata/_edit_lock_ = true
 metadata/_edit_group_ = true
 
 [node name="BG" type="Parallax2D" parent="Environment" index="0"]
 
 [node name="BG" type="Sprite2D" parent="Environment/BG" index="0"]
+visible = false
 position = Vector2(2943, -1916)
 rotation = 1.5708
 scale = Vector2(25, 12800)
 texture = SubResource("GradientTexture1D_kkc2m")
 
 [node name="Sun" type="Sprite2D" parent="Environment/BG" index="1"]
+visible = false
 self_modulate = Color(1, 0.812941, 0.623625, 1)
 position = Vector2(1475, -85)
 scale = Vector2(0.5, 0.5)
@@ -350,6 +345,7 @@ scale = Vector2(1.1, 1.1)
 texture = ExtResource("5_oub63")
 
 [node name="Clouds" type="Parallax2D" parent="Environment" index="1"]
+visible = false
 modulate = Color(0.939617, 0.874556, 0.832851, 1)
 scale = Vector2(0.3, 0.3)
 scroll_scale = Vector2(0.7, 0.99)
@@ -658,99 +654,119 @@ scale = Vector2(1.25, 1.25)
 texture = ExtResource("9_xo686")
 flip_h = true
 
-[node name="PlatformLayer" parent="." index="4"]
-visible = false
+[node name="PlatformLayer" parent="." index="5"]
 tile_map_data = PackedByteArray("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")
 
-[node name="GroundLayer" parent="." index="5"]
-visible = false
+[node name="GroundLayer" parent="." index="6"]
 tile_map_data = PackedByteArray("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AAB4AAUAAAAAAAAAAAB4AAQAAAAAAAAAAAB4AAMAAAAAAAAAAAB4AAIAAAAAAAAAAAB4AAEAAAAAAAAAAAB4AAAAAAAAAAAAAAB4AP//AAAAAAAAAAB4AP7/AAAAAAAAAAB4AP3/AAAAAAAAAAB4APz/AAAAAAAAAAB4APv/AAAAAAAAAAB4APr/AAAAAAAAAAB4APn/AAAAAAAAAAB4APj/AAAAAAAAAAB4APf/AAAAAAAAAAB4APb/AAAAAAAAAAB4APX/AAAAAAAAAAB4APT/AAAAAAAAAAB4APP/AAAAAAAAAAB4APL/AAAAAAAAAAB4APH/AAAAAAAAAAB4APD/AAAAAAAAAAB4AO//AAAAAAAAAAB4AO7/AAAAAAAAAAB4AO3/AAAAAAAAAAB4AOz/AAAAAAAAAAB4AOv/AAAAAAAAAAB4AOr/AAAAAAAAAAB4AOn/AAAAAAAAAAB4AOj/AAAAAAAAAAB4AOf/AAAAAAAAAAB4AOb/AAAAAAAAAAB4AOX/AAAAAAAAAAB4AOT/AAAAAAAAAAB4AOP/AAAAAAAAAAB4AOL/AAAAAAAAAAB4AOH/AAAAAAAAAAB4AOD/AAAAAAAAAAB4AN//AAAAAAAAAAB4AN7/AAAAAAAAAAB4AN3/AAAAAAAAAAB4ANz/AAAAAAAAAAB4ANv/AAAAAAAAAAB4ANr/AAAAAAAAAAB4ANn/AAAAAAAAAAB4ANj/AAAAAAAAAAB4ANf/AAAAAAAAAAB4ANb/AAAAAAAAAAB4ANX/AAAAAAAAAAB4ANT/AAAAAAAAAAB4ANP/AAAAAAAAAAB4ANL/AAAAAAAAAAB4ANH/AAAAAAAAAAB4AND/AAAAAAAAAAB4AM//AAAAAAAAAAB4AM7/AAAAAAAAAAB4AM3/AAAAAAAAAAB4AMz/AAAAAAAAAAB4AMv/AAAAAAAAAAB4AMr/AAAAAAAAAAB4AMn/AAAAAAAAAAB4AMj/AAAAAAAAAAB4AMf/AAAAAAAAAAB4AMb/AAAAAAAAAAB4AMX/AAAAAAAAAAB4AMT/AAAAAAAAAAB4AMP/AAAAAAAAAAB4AML/AAAAAAAAAAB4AMH/AAAAAAAAAAB4AMD/AAAAAAAAAAB4AL//AAAAAAAAAAB4AL7/AAAAAAAAAAB4AL3/AAAAAAAAAAB4ALz/AAAAAAAAAAB4ALv/AAAAAAAAAAB4ALr/AAAAAAAAAAB4ALn/AAAAAAAAAAB4ALj/AAAAAAAAAADo/woAAAAAAAAAAADo/wkAAAAAAAAAAADo/wgAAAAAAAAAAADo/wcAAAAAAAAAAADo/wYAAAAAAAAAAADo/wUAAAAAAAAAAADo/wQAAAAAAAAAAADo/wMAAAAAAAAAAADo/wIAAAAAAAAAAADo/wEAAAAAAAAAAADo/wAAAAAAAAAAAADo////AAAAAAAAAADo//7/AAAAAAAAAADo//3/AAAAAAAAAADo//z/AAAAAAAAAADo//v/AAAAAAAAAADo//r/AAAAAAAAAADo//n/AAAAAAAAAADo//j/AAAAAAAAAADo//f/AAAAAAAAAADo//b/AAAAAAAAAADo//X/AAAAAAAAAADo//T/AAAAAAAAAADo//P/AAAAAAAAAADo//L/AAAAAAAAAADo//H/AAAAAAAAAADo//D/AAAAAAAAAADo/+//AAAAAAAAAADo/+7/AAAAAAAAAADo/+3/AAAAAAAAAADo/+z/AAAAAAAAAADo/+v/AAAAAAAAAADo/+r/AAAAAAAAAADo/+n/AAAAAAAAAADo/+j/AAAAAAAAAADo/+f/AAAAAAAAAADo/+b/AAAAAAAAAADo/+X/AAAAAAAAAADo/+T/AAAAAAAAAADo/+P/AAAAAAAAAADo/+L/AAAAAAAAAAA=")
 
-[node name="CustomLayer" parent="." index="6"]
-visible = false
+[node name="PathBuilder" parent="." index="8"]
+visible = true
+
+[node name="SubsceneSwapper" type="Node" parent="." index="10"]
+script = ExtResource("12_85nld")
+subscenes = Dictionary[String, PackedScene]({
+"06_escape_sequence_completed": ExtResource("13_qme1u")
+})
+
+[node name="BaseCampTheme" type="AudioStreamPlayer" parent="." index="11"]
+process_mode = 3
+stream = ExtResource("23_1wc12")
+autoplay = true
+bus = &"Music"
 
 [node name="HeadArchaeologist" parent="Interactables" index="0" instance=ExtResource("2_ape1j")]
-visible = false
 position = Vector2(143, 692)
 style = SubResource("Resource_2858o")
 
-[node name="InteractableDialogue" type="Area2D" parent="Interactables/HeadArchaeologist" index="10"]
+[node name="InteractableDialogue" type="Area2D" parent="Interactables/HeadArchaeologist" index="10" node_paths=PackedStringArray("target")]
+collision_layer = 8
 script = ExtResource("3_bfpds")
 timeline = ExtResource("4_84rqi")
-labels = {
+labels = Dictionary[String, String]({
 "06_escape_sequence_completed": "head_archaeologist_aftermath",
 "06_finished": "head_archaeologist_aftermath_repeat",
 "06_spoke_to_head_archaeologist": "head_archaeologist_repeat",
 "06_started": "head_archaeologist"
-}
+})
+target = NodePath("..")
+player_interact_offset = Vector2(200, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interactables/HeadArchaeologist/InteractableDialogue" index="0"]
 position = Vector2(1.5, -109)
 shape = SubResource("RectangleShape2D_iefh0")
 
 [node name="Archaeologist1" parent="Interactables" index="1" instance=ExtResource("2_ape1j")]
-visible = false
 position = Vector2(1230, 685)
 style = SubResource("Resource_0tt1y")
 
-[node name="InteractableDialogue" type="Area2D" parent="Interactables/Archaeologist1" index="10"]
+[node name="InteractableDialogue" type="Area2D" parent="Interactables/Archaeologist1" index="10" node_paths=PackedStringArray("target")]
+collision_layer = 8
 script = ExtResource("3_bfpds")
 timeline = ExtResource("4_84rqi")
-labels = {
+labels = Dictionary[String, String]({
 "06_escape_sequence_completed": "archaeologist_1_aftermath",
 "06_started": "archaeologist_1"
-}
+})
+target = NodePath("..")
+player_interact_offset = Vector2(200, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interactables/Archaeologist1/InteractableDialogue" index="0"]
 position = Vector2(8.5, -109)
 shape = SubResource("RectangleShape2D_iefh0")
 
 [node name="Archaeologist2" parent="Interactables" index="2" instance=ExtResource("2_ape1j")]
-visible = false
 position = Vector2(-734, 678)
 style = SubResource("Resource_l1h24")
 
-[node name="InteractableDialogue" type="Area2D" parent="Interactables/Archaeologist2" index="10"]
+[node name="InteractableDialogue" type="Area2D" parent="Interactables/Archaeologist2" index="10" node_paths=PackedStringArray("target")]
+collision_layer = 8
 script = ExtResource("3_bfpds")
 timeline = ExtResource("4_84rqi")
-labels = {
+labels = Dictionary[String, String]({
 "06_escape_sequence_completed": "archaeologist_2_aftermath",
 "06_started": "archaeologist_2"
-}
+})
+target = NodePath("..")
+player_interact_offset = Vector2(200, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interactables/Archaeologist2/InteractableDialogue" index="0"]
 position = Vector2(4, -109)
 shape = SubResource("RectangleShape2D_iefh0")
 
 [node name="Archaeologist3" parent="Interactables" index="3" instance=ExtResource("2_ape1j")]
-visible = false
 position = Vector2(-1136, 678)
 style = SubResource("Resource_gy4em")
 
-[node name="InteractableDialogue" type="Area2D" parent="Interactables/Archaeologist3" index="10"]
+[node name="InteractableDialogue" type="Area2D" parent="Interactables/Archaeologist3" index="10" node_paths=PackedStringArray("target")]
+collision_layer = 8
 script = ExtResource("3_bfpds")
 timeline = ExtResource("4_84rqi")
-labels = {
+labels = Dictionary[String, String]({
 "06_escape_sequence_completed": "archaeologist_3_aftermath",
 "06_started": "archaeologist_3"
-}
+})
+target = NodePath("..")
+player_interact_offset = Vector2(200, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interactables/Archaeologist3/InteractableDialogue" index="0"]
 position = Vector2(4, -109)
 shape = SubResource("RectangleShape2D_iefh0")
 
 [node name="Archaeologist4" parent="Interactables" index="4" instance=ExtResource("2_ape1j")]
-visible = false
 position = Vector2(2367, 688)
 style = SubResource("Resource_1pbtf")
 
-[node name="InteractableDialogue" type="Area2D" parent="Interactables/Archaeologist4" index="10"]
+[node name="InteractableDialogue" type="Area2D" parent="Interactables/Archaeologist4" index="10" node_paths=PackedStringArray("target")]
+collision_layer = 8
 script = ExtResource("3_bfpds")
 timeline = ExtResource("4_84rqi")
-labels = {
+labels = Dictionary[String, String]({
 "06_escape_sequence_completed": "archaeologist_4_aftermath",
 "06_started": "archaeologist_4"
-}
+})
+target = NodePath("..")
+player_interact_offset = Vector2(200, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interactables/Archaeologist4/InteractableDialogue" index="0"]
 position = Vector2(4, -109)
@@ -759,23 +775,24 @@ shape = SubResource("RectangleShape2D_iefh0")
 [node name="Door" type="Node2D" parent="Interactables" index="5"]
 position = Vector2(6861, -3027)
 
-[node name="InteractableSceneSwitch" type="Area2D" parent="Interactables/Door" index="0"]
+[node name="InteractableSceneSwitch" type="Area2D" parent="Interactables/Door" index="0" node_paths=PackedStringArray("target")]
 collision_layer = 8
 script = ExtResource("5_0up63")
 scene_name = "mural"
-player_interact_offset = Vector2(0, 0)
+target = NodePath("..")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Interactables/Door/InteractableSceneSwitch" index="0"]
 polygon = PackedVector2Array(-195, 22, -152, -135, -106, -246, -23, -295, 77, -284, 132, -225, 160, -133, 187, 23)
 
-[node name="InteractableDialogue" type="Area2D" parent="Interactables/Door" index="1"]
+[node name="InteractableDialogue" type="Area2D" parent="Interactables/Door" index="1" node_paths=PackedStringArray("target")]
+collision_layer = 8
 script = ExtResource("3_bfpds")
 timeline = ExtResource("4_84rqi")
-labels = {
+labels = Dictionary[String, String]({
 "06_started": "force_walkie_talkie"
-}
+})
 text_bubble_markers = Array[NodePath]([NodePath("../../../Player/TextBubbleMarker")])
-player_interact_offset = Vector2(0, 0)
+target = NodePath("..")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Interactables/Door/InteractableDialogue" index="0"]
 polygon = PackedVector2Array(-195, 22, -152, -135, -106, -246, -23, -295, 77, -284, 132, -225, 160, -133, 187, 23)
@@ -784,15 +801,3 @@ polygon = PackedVector2Array(-195, 22, -152, -135, -106, -246, -23, -295, 77, -2
 script = ExtResource("8_1d67a")
 game_event = "06_spoke_to_head_archaeologist"
 target = NodePath("..")
-
-[node name="SubsceneSwapper" type="Node" parent="." index="10"]
-script = ExtResource("12_85nld")
-subscenes = {
-"06_escape_sequence_completed": ExtResource("13_qme1u")
-}
-
-[node name="BaseCampTheme" type="AudioStreamPlayer" parent="." index="11"]
-process_mode = 3
-stream = ExtResource("23_1wc12")
-autoplay = true
-bus = &"Music"

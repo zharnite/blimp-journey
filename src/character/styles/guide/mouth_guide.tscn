@@ -3,9 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://bc8o3rxp8g53h" path="res://src/character/styles/guide/mouth.png" id="1_2hfht"]
 [ext_resource type="Script" uid="uid://b45j8fky1o1s1" path="res://src/character/common/style/style_part.gd" id="2_tw76l"]
 
-[node name="Mouth" type="Sprite2D"]
-texture = ExtResource("1_2hfht")
-offset = Vector2(9, -6)
+[node name="Mouth" type="Node2D"]
 script = ExtResource("2_tw76l")
 style_name = "mouth_guide"
 part = 11
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(9, 25)
+texture = ExtResource("1_2hfht")
